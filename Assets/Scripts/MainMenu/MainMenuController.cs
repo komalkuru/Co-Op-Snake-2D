@@ -27,16 +27,18 @@ public class MainMenuController : MonoBehaviour
 
     public void StartGame()
     {
+        SoundManager.Instance.Play(Sounds.ButtonClick);
         ChooseOption.SetActive(true);
     }
-
     public void PlaySinglePlayerGame()
     {
+        SoundManager.Instance.Play(Sounds.ButtonClick);
         PlayGameObject.SetActive(true);
     }
 
     public void PlayGame()
     {
+        SoundManager.Instance.Play(Sounds.ButtonClick);
         SceneManager.LoadScene(sceneName);
     }
 }

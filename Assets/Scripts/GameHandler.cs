@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class GameHandler : MonoBehaviour 
 {
-
     private static GameHandler instance;
-    public static int score;
 
     [SerializeField] private SnakeController snakeController;
 
@@ -14,6 +12,9 @@ public class GameHandler : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        Score.InitializeStatic();
+
+        Score.TrySetNewHighscore(0);
     }
     private void Start() {
         Debug.Log("GameHandler.Start");
@@ -23,13 +24,8 @@ public class GameHandler : MonoBehaviour
         snakeController.Setup(levelGrid);
         levelGrid.Setup(snakeController);
     }
-
-    public static int GetScore()
+    public static void SnakeDied()
     {
-        return score;
-    }
-    public static void AddScore()
-    {
-        score += 10;
+        Score.TrySetNewHighscore();
     }
 }
