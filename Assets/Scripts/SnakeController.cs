@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum State
+{
+    Alive,
+    Dead
+}
+
 public class SnakeController : MonoBehaviour
 {
     private enum Direction
@@ -10,36 +16,37 @@ public class SnakeController : MonoBehaviour
         Right,
         Up,
         Down
-    }
-
-    private enum State
-    {
-        Alive,
-        Dead
-    }
+    } 
 
     private State state;
     private Direction gridMoveDirection;
     private Vector2Int gridPosition;
-    private float gridMoveTimer;
-    private float gridMoveTimerMax;
-    private LevelGrid levelGrid;
+
+    private float snakeMoveTimer;
+    [HideInInspector] public float snakeMoveTimerMax;
+
     private int snakeBodySize;
+    private int width;
+    private int height;
+
     private List<SnakeMovePosition> snakeMovePositionList;
     private List<SnakeBodyPart> snakeBodyPartList;
 
-    public GameObject GameOverObject;
+    [HideInInspector] public bool deadFood = false;
+    [HideInInspector] public bool shield = false;
 
-    public void Setup(LevelGrid levelGrid)
-    {
-        this.levelGrid = levelGrid;
-    }
+    [SerializeField] private FoodSpawner foodSpawner;
+    [SerializeField] private PowerUpController powerUp;
+    [SerializeField] private GameObject GameOverObject;
 
     private void Awake()
     {
+        width = 20;
+        height = 20;
+
         gridPosition = new Vector2Int(10, 10);
-        gridMoveTimerMax = .2f;
-        gridMoveTimer = gridMoveTimerMax;
+        snakeMoveTimerMax = .2f;
+        snakeMoveTimer = snakeMoveTimerMax;
         gridMoveDirection = Direction.Right;
 
         snakeMovePositionList = new List<SnakeMovePosition>();
@@ -97,10 +104,10 @@ public class SnakeController : MonoBehaviour
 
     private void HandleGridMovement()
     {
-        gridMoveTimer += Time.deltaTime;
-        if (gridMoveTimer >= gridMoveTimerMax)
+        snakeMoveTimer += Time.deltaTime;
+        if (snakeMoveTimer >= snakeMoveTimerMax)
         {
-            gridMoveTimer -= gridMoveTimerMax;
+            snakeMoveTimer -= snakeMoveTimerMax;
 
             SoundManager.Instance.Play(Sounds.SnakeMove);
             SnakeMovePosition previousSnakeMovePosition = null;
@@ -124,49 +131,75 @@ public class SnakeController : MonoBehaviour
 
             gridPosition += gridMoveDirectionVector;
 
-            gridPosition = levelGrid.ValidateGridPosition(gridPosition);
+            gridPosition = ValidateGridPosition(gridPosition);
 
-            bool snakeAteFood = levelGrid.TrySnakeEatFood(gridPosition);
+            bool snakeAteFood = foodSpawner.EatFood(gridPosition);
             if (snakeAteFood)
             {
                 // Snake ate food, grow body
-                snakeBodySize++;
-                CreateSnakeBodyPart();
-                SoundManager.Instance.Play(Sounds.SnakeEat);
+                if (deadFood)
+                {
+                    if (snakeBodySize > 0 && !shield)
+                    {
+                        RemoveSnakeBody();
+                        snakeBodySize--;
+                        SoundManager.Instance.Play(Sounds.SnakeEat);
+                    }
+                    else
+                    {
+                        deadFood = false;
+                    }
+                }
+                else
+                {
+                    snakeBodySize++;
+                    CreateSnakeBody();
+                    SoundManager.Instance.Play(Sounds.SnakeEat);
+                }                
             }
+            bool snakePowerUp = powerUp.SnakePowerUp(gridPosition);
 
             if (snakeMovePositionList.Count >= snakeBodySize + 1)
             {
                 snakeMovePositionList.RemoveAt(snakeMovePositionList.Count - 1);
             }
 
-            UpdateSnakeBodyParts();
-
             foreach (SnakeBodyPart snakeBodyPart in snakeBodyPartList)
             {
                 Vector2Int snakeBodyPartGridPosition = snakeBodyPart.GetGridPosition();
                 if (gridPosition == snakeBodyPartGridPosition)
                 {
-                    // Game Over!
-                    Debug.Log("Snake Dead");
-                    state = State.Dead;
-                    GameHandler.SnakeDied();
-                    SoundManager.Instance.Play(Sounds.SnakeDie);
-                    GameOverObject.SetActive(true);
+                    if(!shield)
+                    {
+                        // Game Over!
+                        Debug.Log("Snake Dead");
+                        state = State.Dead;
+                        GameHandler.SnakeDied();
+                        SoundManager.Instance.Play(Sounds.SnakeDie);
+                        GameOverObject.SetActive(true);
+                    }
                 }
             }
 
             transform.position = new Vector3(gridPosition.x, gridPosition.y);
             transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(gridMoveDirectionVector) - 90);
+
+            UpdateSnakeBody();
         }
     }
 
-    private void CreateSnakeBodyPart()
+    private void CreateSnakeBody()
     {
         snakeBodyPartList.Add(new SnakeBodyPart(snakeBodyPartList.Count));
     }
 
-    private void UpdateSnakeBodyParts()
+    private void RemoveSnakeBody()
+    {
+        Destroy(snakeBodyPartList[snakeBodyPartList.Count - 1].snakeBodyGameObject);
+        snakeBodyPartList.RemoveAt(snakeBodyPartList.Count - 1);
+    }
+
+    private void UpdateSnakeBody()
     {
         for (int i = 0; i < snakeBodyPartList.Count; i++)
         {
@@ -206,11 +239,12 @@ public class SnakeController : MonoBehaviour
 
         private SnakeMovePosition snakeMovePosition;
         private Transform transform;
+        public GameObject snakeBodyGameObject;
 
         public SnakeBodyPart(int bodyIndex)
         {
-            GameObject snakeBodyGameObject = new GameObject("RedSnakeBody", typeof(SpriteRenderer));
-            snakeBodyGameObject.GetComponent<SpriteRenderer>().sprite = GameAssets.instanceObject.snakeBodySprite;
+            snakeBodyGameObject = new GameObject("SnakeBody", typeof(SpriteRenderer));
+            snakeBodyGameObject.GetComponent<SpriteRenderer>().sprite = AllSprites.Instance.SnakeBody1;
             snakeBodyGameObject.GetComponent<SpriteRenderer>().sortingOrder = -1 - bodyIndex;
             transform = snakeBodyGameObject.transform;
         }
@@ -296,11 +330,14 @@ public class SnakeController : MonoBehaviour
 
         public Vector2Int GetGridPosition()
         {
-            return snakeMovePosition.GetGridPosition();
+            if (snakeMovePosition != null)
+            {
+                return snakeMovePosition.GetGridPosition();
+            }
+
+            else return new Vector2Int(0, 0);
         }
     }
-
-
 
     /*
      * Handles one Move Position from the Snake
@@ -341,5 +378,31 @@ public class SnakeController : MonoBehaviour
             }
         }
 
+    }
+
+    public Vector2Int ValidateGridPosition(Vector2Int gridPosition)
+    {
+        if (gridPosition.x < 0)
+        {
+            gridPosition.x = width - 1;
+        }
+        if (gridPosition.x > width - 1)
+        {
+            gridPosition.x = 0;
+        }
+        if (gridPosition.y < 0)
+        {
+            gridPosition.y = height - 1;
+        }
+        if (gridPosition.y > height - 1)
+        {
+            gridPosition.y = 0;
+        }
+        return gridPosition;
+    }
+
+    public int GetSnakeFullSize()
+    {
+        return snakeBodyPartList.Count;
     }
 }
