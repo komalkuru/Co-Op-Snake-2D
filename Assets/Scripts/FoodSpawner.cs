@@ -39,7 +39,7 @@ public class FoodSpawner : MonoBehaviour
 
         if (snake.GetSnakeFullSize() > 1)
         {
-            int select = Random.Range(0, 2);
+            int select = Random.Range(0, 3);
             switch (select)
             {
                 default:

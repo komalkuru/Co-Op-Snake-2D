@@ -104,7 +104,7 @@ public class PowerUpController : MonoBehaviour
     public IEnumerator SpeedUp()
     {
         yield return new WaitForSeconds(6);
-        snake.snakeMoveTimerMax = 0.2f;
+        snake.snakeMoveTimerMax = 0.1f;
         yield break;
     }
 

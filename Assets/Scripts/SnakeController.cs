@@ -18,7 +18,7 @@ public class SnakeController : MonoBehaviour
         Down
     } 
 
-    private State state;
+    public State state;
     private Direction gridMoveDirection;
     private Vector2Int gridPosition;
 
@@ -37,7 +37,7 @@ public class SnakeController : MonoBehaviour
 
     [SerializeField] private FoodSpawner foodSpawner;
     [SerializeField] private PowerUpController powerUp;
-    [SerializeField] private GameObject GameOverObject;
+    [SerializeField] private GameOverWindow gameOver;
 
     private void Awake()
     {
@@ -45,7 +45,7 @@ public class SnakeController : MonoBehaviour
         height = 20;
 
         gridPosition = new Vector2Int(10, 10);
-        snakeMoveTimerMax = .2f;
+        snakeMoveTimerMax = 0.1f;
         snakeMoveTimer = snakeMoveTimerMax;
         gridMoveDirection = Direction.Right;
 
@@ -55,6 +55,12 @@ public class SnakeController : MonoBehaviour
         snakeBodyPartList = new List<SnakeBodyPart>();
 
         state = State.Alive;
+
+        gameOver.DisableUI();
+    }
+    public void ResetGame()
+    {
+        Awake();
     }
 
     private void Update()
@@ -139,15 +145,11 @@ public class SnakeController : MonoBehaviour
                 // Snake ate food, grow body
                 if (deadFood)
                 {
-                    if (snakeBodySize > 0 && !shield)
+                    if (snakeBodySize > 0)
                     {
                         RemoveSnakeBody();
                         snakeBodySize--;
                         SoundManager.Instance.Play(Sounds.SnakeEat);
-                    }
-                    else
-                    {
-                        deadFood = false;
                     }
                 }
                 else
@@ -174,9 +176,8 @@ public class SnakeController : MonoBehaviour
                         // Game Over!
                         Debug.Log("Snake Dead");
                         state = State.Dead;
-                        GameHandler.SnakeDied();
                         SoundManager.Instance.Play(Sounds.SnakeDie);
-                        GameOverObject.SetActive(true);
+                        gameOver.GameOver();
                     }
                 }
             }

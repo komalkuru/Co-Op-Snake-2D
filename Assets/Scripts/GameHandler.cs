@@ -5,7 +5,7 @@ public class GameHandler : MonoBehaviour
 {
     private static GameHandler instance;
     public static GameHandler Instance { get { return instance; } }
-    public static int score;
+    private static int score;
 
     [SerializeField] private SnakeController snakeController;
     [SerializeField] private FoodSpawner foodSpawn;
@@ -23,9 +23,7 @@ public class GameHandler : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
-        Score.InitializeStatic();
-
-        Score.TrySetNewHighscore(0);
+        InitializeStatic();
     }   
 
     public static int GetScore()
@@ -52,9 +50,9 @@ public class GameHandler : MonoBehaviour
         }
     }
 
-    public static void SnakeDied()
+    public static void InitializeStatic()
     {
-        Score.TrySetNewHighscore();
+        score = 0;
     }
 
 }
