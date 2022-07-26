@@ -14,16 +14,16 @@ public static class Score {
         score = 0;
     }
 
-    public static int GetScore() {
+    /*public static int GetScore() {
         return score;
     }
 
     public static void AddScore() {
         score += 10;
-    }
+    }*/
 
     public static int GetHighscore() {
-        return PlayerPrefs.GetInt("highscore", 0);
+        return PlayerPrefs.GetInt("Highscore: ", 0);
     }
 
     public static bool TrySetNewHighscore() {
@@ -33,13 +33,12 @@ public static class Score {
     public static bool TrySetNewHighscore(int score) {
         int highscore = GetHighscore();
         if (score > highscore) {
-            PlayerPrefs.SetInt("highscore", score);
+            PlayerPrefs.SetInt("Highscore: ", score);
             PlayerPrefs.Save();
-            if (OnHighscoreChanged != null) OnHighscoreChanged(null, EventArgs.Empty);
+             if (OnHighscoreChanged != null) OnHighscoreChanged(null, EventArgs.Empty);
             return true;
         } else {
             return false;
         }
     }
-
 }

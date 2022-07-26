@@ -6,37 +6,26 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
-    [SerializeField] private Button startButton;
-    [SerializeField] private Button aboutGameButton;
-    [SerializeField] private Button quitButton;
-    [SerializeField] private GameObject ChooseOption;
-    [SerializeField] private Button singlePlayer;
-    [SerializeField] private Button multiPlayer;
-    public GameObject PlayGameObject;
-    [SerializeField] private Button playButton;
-    public string sceneName;
-    
+    [SerializeField] private GameObject object1;
+    [SerializeField] private GameObject object2;
 
-
-    private void Start()
+    public void Quit()
     {
-        startButton.onClick.AddListener(StartGame);
-        singlePlayer.onClick.AddListener(PlaySinglePlayerGame);
-        playButton.onClick.AddListener(PlayGame);
+        SoundManager.Instance.Play(Sounds.ButtonClick);
+        Application.Quit();
     }
 
-    public void StartGame()
+    public void ModeSelect()
     {
-        ChooseOption.SetActive(true);
+        SoundManager.Instance.Play(Sounds.ButtonClick);
+        object1.SetActive(true);
+        object2.SetActive(true);
     }
 
-    public void PlaySinglePlayerGame()
+    public void BackToMenu()
     {
-        PlayGameObject.SetActive(true);
-    }
-
-    public void PlayGame()
-    {
-        SceneManager.LoadScene(sceneName);
+        SoundManager.Instance.Play(Sounds.ButtonClick);
+        object1.SetActive(true);
+        object2.SetActive(false);
     }
 }

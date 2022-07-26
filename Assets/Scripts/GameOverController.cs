@@ -21,11 +21,13 @@ public class GameOverController : MonoBehaviour
 
     public void PlayGame()
     {
+        SoundManager.Instance.Play(Sounds.ButtonClick);
         SceneManager.LoadScene(singlePlayerSceneName);
     }
 
     public void PlaySinglePlayerGame()
     {
+        SoundManager.Instance.Play(Sounds.ButtonClick);
         SceneManager.LoadScene(mainSceneName);
     }
 }
