@@ -356,7 +356,6 @@ public class MultipleSnakeController : MonoBehaviour
             {
                 snakeBodyGameObject.GetComponent<SpriteRenderer>().sprite = AllSprites.Instance.SnakeBody1;
             }
-            //snakeBodyGameObject.GetComponent<SpriteRenderer>().sprite = GameAssets.Instance.SnakeBodySprite;
             transform = snakeBodyGameObject.transform;
         }
 

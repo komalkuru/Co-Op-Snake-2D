@@ -54,5 +54,4 @@ public class GameHandler : MonoBehaviour
     {
         score = 0;
     }
-
 }

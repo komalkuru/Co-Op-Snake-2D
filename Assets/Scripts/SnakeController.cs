@@ -266,66 +266,57 @@ public class SnakeController : MonoBehaviour
                         default:
                             angle = 0;
                             break;
-                        case Direction.Left: // Previously was going Left
+                        case Direction.Left: 
                             angle = 0 + 45;
-                            transform.position += new Vector3(.2f, .2f);
                             break;
-                        case Direction.Right: // Previously was going Right
+                        case Direction.Right: 
                             angle = 0 - 45;
-                            transform.position += new Vector3(-.2f, .2f);
                             break;
                     }
                     break;
-                case Direction.Down: // Currently going Down
+                case Direction.Down: 
                     switch (snakeMovePosition.GetPreviousDirection())
                     {
                         default:
                             angle = 180;
                             break;
-                        case Direction.Left: // Previously was going Left
+                        case Direction.Left: 
                             angle = 180 - 45;
-                            transform.position += new Vector3(.2f, -.2f);
                             break;
-                        case Direction.Right: // Previously was going Right
+                        case Direction.Right: 
                             angle = 180 + 45;
-                            transform.position += new Vector3(-.2f, -.2f);
                             break;
                     }
                     break;
-                case Direction.Left: // Currently going to the Left
+                case Direction.Left: 
                     switch (snakeMovePosition.GetPreviousDirection())
                     {
                         default:
                             angle = +90;
                             break;
-                        case Direction.Down: // Previously was going Down
+                        case Direction.Down: 
                             angle = 180 - 45;
-                            transform.position += new Vector3(-.2f, .2f);
                             break;
-                        case Direction.Up: // Previously was going Up
+                        case Direction.Up: 
                             angle = 45;
-                            transform.position += new Vector3(-.2f, -.2f);
                             break;
                     }
                     break;
-                case Direction.Right: // Currently going to the Right
+                case Direction.Right: 
                     switch (snakeMovePosition.GetPreviousDirection())
                     {
                         default:
                             angle = -90;
                             break;
-                        case Direction.Down: // Previously was going Down
+                        case Direction.Down:
                             angle = 180 + 45;
-                            transform.position += new Vector3(.2f, .2f);
                             break;
-                        case Direction.Up: // Previously was going Up
+                        case Direction.Up: 
                             angle = -45;
-                            transform.position += new Vector3(.2f, -.2f);
                             break;
                     }
                     break;
             }
-
             transform.eulerAngles = new Vector3(0, 0, angle);
         }
 
@@ -335,7 +326,6 @@ public class SnakeController : MonoBehaviour
             {
                 return snakeMovePosition.GetGridPosition();
             }
-
             else return new Vector2Int(0, 0);
         }
     }
@@ -345,7 +335,6 @@ public class SnakeController : MonoBehaviour
      * */
     private class SnakeMovePosition
     {
-
         private SnakeMovePosition previousSnakeMovePosition;
         private Vector2Int gridPosition;
         private Direction direction;
@@ -378,7 +367,6 @@ public class SnakeController : MonoBehaviour
                 return previousSnakeMovePosition.direction;
             }
         }
-
     }
 
     public Vector2Int ValidateGridPosition(Vector2Int gridPosition)
